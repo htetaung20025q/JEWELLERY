@@ -1,0 +1,2657 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>FastAPI Masterclass</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ========================================
+           CSS Variables - Modern
+           ======================================== */
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #5eead4;
+            --primary-gradient: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+            --secondary: #1e293b;
+            --bg-main: #f0f4f8;
+            --bg-card: #ffffff;
+            --bg-sidebar: #0f172a;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-light: #94a3b8;
+            --text-white: #f8fafc;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --radius: 16px;
+            --radius-sm: 8px;
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pyidaungsu', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            
+            /* Mobile safe areas */
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            min-height: 100dvh;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.7;
+            overflow-x: hidden;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+        }
+
+        /* ========================================
+           Scrollbar
+           ======================================== */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 2px; }
+
+        /* ========================================
+           Sidebar - Mobile Optimized
+           ======================================== */
+        .sidebar {
+            width: 300px;
+            max-width: 80vw;
+            background: var(--bg-sidebar);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            padding: 0;
+            z-index: 1000;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 20px 20px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: sticky;
+            top: 0;
+            background: var(--bg-sidebar);
+            z-index: 5;
+        }
+
+        .sidebar-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-light);
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-header .logo span {
+            background: var(--primary-gradient);
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-top: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 14px 9px 38px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-white);
+            font-size: 14px;
+            font-family: var(--font);
+            outline: none;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+        }
+
+        .search-box input::placeholder { color: rgba(255,255,255,0.4); }
+        .search-box .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+        .search-box .hint {
+            display: none;
+        }
+
+        .sidebar-nav {
+            padding: 8px 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 20px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .sidebar-nav a:active {
+            background: rgba(255,255,255,0.08);
+            transform: scale(0.98);
+        }
+
+        .sidebar-nav a:hover { color: white; background: rgba(255,255,255,0.04); }
+        .sidebar-nav a.active { color: white; background: rgba(13, 148, 136, 0.15); border-left-color: var(--primary); }
+
+        .sidebar-nav a .status {
+            font-size: 11px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.3);
+            font-weight: 600;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+        .sidebar-nav a .status.done { background: var(--success); color: white; }
+
+        .sidebar-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-sidebar);
+        }
+
+        .progress-track { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+        .progress-track .fill { height: 100%; width: 0%; background: var(--primary-gradient); border-radius: 2px; transition: width 0.6s ease; }
+        .progress-info { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.3); font-weight: 500; }
+
+        /* ========================================
+           Sidebar Overlay
+           ======================================== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            animation: fadeIn 0.3s ease;
+        }
+        .sidebar-overlay.show { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ========================================
+           Main Content - Mobile First
+           ======================================== */
+        .main {
+            flex: 1;
+            padding: 16px;
+            max-width: 100%;
+            transition: margin-left 0.3s;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           Top Bar - Mobile Optimized
+           ======================================== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-main);
+            z-index: 100;
+            padding-top: 8px;
+            transition: background 0.3s;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            min-width: 44px;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        .menu-btn:active { background: rgba(0,0,0,0.05); }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* ========================================
+           Buttons - Mobile Optimized
+           ======================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 36px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn .btn-text { display: none; }
+        .btn .btn-icon { font-size: 14px; }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border-color: var(--primary);
+            color: white;
+        }
+        .btn-primary:active { opacity: 0.8; }
+
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:active { background: var(--danger); color: white; }
+
+        .dark-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: var(--font);
+            font-size: 12px;
+            transition: all 0.3s;
+            min-height: 36px;
+            touch-action: manipulation;
+        }
+        .dark-toggle .slider {
+            width: 32px;
+            height: 18px;
+            background: var(--border-color);
+            border-radius: 9px;
+            position: relative;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .dark-toggle .slider::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        [data-theme="dark"] .dark-toggle .slider { background: var(--primary); }
+        [data-theme="dark"] .dark-toggle .slider::after { transform: translateX(14px); }
+
+        .lang-select {
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 12px;
+            font-family: var(--font);
+            cursor: pointer;
+            min-height: 36px;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 24px;
+        }
+
+        /* ========================================
+           Lesson Cards - Mobile First
+           ======================================== */
+        .lesson {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            scroll-margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .lesson:target {
+            animation: glow 1.5s ease;
+        }
+
+        @keyframes glow {
+            0%, 100% { border-color: var(--border-color); }
+            50% { border-color: var(--primary); box-shadow: 0 0 20px rgba(13, 148, 136, 0.1); }
+        }
+
+        .lesson-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .lesson-badge.essential { background: rgba(239, 68, 68, 0.12); color: var(--danger); }
+        .lesson-badge.advanced { background: rgba(234, 179, 8, 0.12); color: var(--warning); }
+        .lesson-badge.default { background: rgba(13, 148, 136, 0.1); color: var(--primary); }
+
+        .lesson-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .lesson-header .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .lesson-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+        }
+        .lesson-title .num { color: var(--primary); font-weight: 600; }
+
+        .lesson-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .lesson-actions .btn-sm {
+            padding: 3px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font);
+            min-height: 30px;
+            touch-action: manipulation;
+        }
+        .lesson-actions .btn-sm:active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .lesson-body p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        /* ========================================
+           Code Blocks - Mobile Optimized
+           ======================================== */
+        .code-wrap {
+            position: relative;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: #0f172a;
+        }
+
+        .code-wrap pre {
+            padding: 16px 18px;
+            margin: 0;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.7;
+            color: #e2e8f0;
+            background: transparent;
+            -webkit-overflow-scrolling: touch;
+            white-space: pre;
+            word-break: normal;
+        }
+
+        .code-wrap .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 2px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.4);
+            font-size: 10px;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 26px;
+            touch-action: manipulation;
+        }
+        .code-wrap .copy-btn:active { background: rgba(255,255,255,0.12); }
+        .code-wrap .copy-btn.copied { background: var(--success); color: white; border-color: var(--success); }
+        .code-wrap .lang-tag { display: none; }
+
+        .inline-code {
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(13, 148, 136, 0.08);
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        /* Syntax Colors */
+        .kw { color: #c084fc; }
+        .fn { color: #fcd34d; }
+        .st { color: #34d399; }
+        .cm { color: #64748b; font-style: italic; }
+        .num { color: #60a5fa; }
+
+        /* ========================================
+           Tables - Mobile Optimized
+           ======================================== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 16px 0;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 320px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 14px;
+            background: var(--bg-main);
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        /* ========================================
+           Diagrams - Mobile Optimized
+           ======================================== */
+        .diagram {
+            background: var(--bg-main);
+            border-radius: var(--radius-sm);
+            padding: 16px 12px;
+            margin: 16px 0;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .diagram svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .diagram svg text {
+            font-family: var(--font);
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .diagram-caption {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-light);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        /* ========================================
+           Quiz - Mobile Optimized
+           ======================================== */
+        .quiz {
+            background: var(--bg-main);
+            border-radius: var(--radius-sm);
+            padding: 18px 16px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .quiz-question {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .quiz-options label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: var(--text-secondary);
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        .quiz-options label:active { transform: scale(0.98); }
+        .quiz-options label:hover { border-color: var(--primary); }
+        .quiz-options label.correct { border-color: var(--success); background: rgba(34, 197, 94, 0.06); }
+        .quiz-options label.wrong { border-color: var(--danger); background: rgba(239, 68, 68, 0.06); }
+        .quiz-options input[type="radio"] {
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .quiz-btn {
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            min-height: 40px;
+        }
+        .quiz-btn:active { opacity: 0.8; transform: scale(0.97); }
+
+        .quiz-result {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+            display: none;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .quiz-result.show { display: block; }
+        .quiz-result.pass { background: rgba(34, 197, 94, 0.1); border: 1px solid var(--success); color: var(--success); }
+        .quiz-result.fail { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); }
+
+        /* ========================================
+           Notes - Mobile Optimized
+           ======================================== */
+        .notes {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .notes-header h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .notes-header .status {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        .notes textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-family: var(--font);
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .notes textarea:focus { outline: none; border-color: var(--primary); }
+
+        /* ========================================
+           References & Misc - Mobile
+           ======================================== */
+        .refs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .refs a {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            min-height: 32px;
+            touch-action: manipulation;
+        }
+        .refs a:active { border-color: var(--primary); color: var(--primary); }
+
+        .cheat {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .cheat-item {
+            padding: 12px 14px;
+            background: var(--bg-main);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--primary);
+        }
+
+        .cheat-item strong {
+            display: block;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .cheat-item span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .prereq {
+            background: rgba(13, 148, 136, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+        }
+
+        .prereq strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .prereq ul {
+            margin: 0 0 0 18px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .prereq ul li { margin-bottom: 1px; }
+
+        .error-box {
+            background: rgba(239, 68, 68, 0.06);
+            border-left: 4px solid var(--danger);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin: 16px 0;
+        }
+
+        .error-box .title { color: var(--danger); font-weight: 600; font-size: 13px; }
+        .error-box .solution { color: var(--success); }
+        .error-box p { font-size: 13px; margin-bottom: 0; }
+
+        /* ========================================
+           Toast - Mobile
+           ======================================== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: calc(100% - 40px);
+            text-align: center;
+            justify-content: center;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ========================================
+           PDF Loader - Mobile
+           ======================================== */
+        .pdf-loader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            padding: 20px;
+        }
+
+        .pdf-loader.show { display: flex; }
+
+        .pdf-loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .pdf-loader p {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* ========================================
+           Mobile Breakpoints
+           ======================================== */
+
+        /* Small phones */
+        @media (max-width: 380px) {
+            .lesson { padding: 16px 14px; }
+            .lesson-title { font-size: 18px; }
+            .topbar-title { font-size: 16px; }
+            .btn { font-size: 11px; padding: 4px 10px; min-height: 32px; }
+            .quiz-options label { font-size: 12px; padding: 8px 12px; min-height: 40px; }
+            .code-wrap pre { font-size: 11px; padding: 14px; }
+            .diagram svg text { font-size: 9px; }
+            .cheat { grid-template-columns: 1fr; }
+        }
+
+        /* Tablets and up */
+        @media (min-width: 600px) {
+            .main { padding: 24px 32px; max-width: 100%; }
+            .lesson { padding: 28px 32px; margin-bottom: 28px; }
+            .lesson-title { font-size: 24px; }
+            .topbar-title { font-size: 20px; }
+            .btn .btn-text { display: inline; }
+            .btn { padding: 8px 16px; font-size: 13px; min-height: 40px; }
+            .diagram svg text { font-size: 12px; }
+            .diagram { padding: 24px; }
+            .code-wrap pre { font-size: 14px; padding: 20px 24px; }
+            .code-wrap .lang-tag { display: block; }
+            .cheat { grid-template-columns: 1fr 1fr; }
+            .search-box .hint { display: block; }
+        }
+
+        /* Desktop */
+        @media (min-width: 1024px) {
+            .sidebar {
+                transform: translateX(0);
+                width: 320px;
+                max-width: 320px;
+            }
+
+            .menu-btn { display: none; }
+
+            .main {
+                margin-left: 320px;
+                padding: 32px 48px 60px;
+                max-width: 1100px;
+            }
+
+            .topbar { padding-top: 0; position: static; }
+            .lesson { padding: 40px 44px; margin-bottom: 40px; }
+            .lesson-title { font-size: 26px; }
+            .diagram svg text { font-size: 13px; }
+            .code-wrap pre { font-size: 14px; padding: 24px 28px; }
+        }
+
+        /* ========================================
+           Print
+           ======================================== */
+        @media print {
+            .sidebar { display: none; }
+            .main { margin: 0; padding: 20px; max-width: 100%; }
+            .btn, .quiz-btn, .dark-toggle, .lang-select, .menu-btn,
+            .lesson-actions, .notes, .topbar-actions, .toast,
+            .pdf-loader, .sidebar-overlay { display: none !important; }
+            .lesson { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            .code-wrap { background: #1a1a2e !important; }
+            .code-wrap pre { color: #e2e8f0 !important; }
+            .diagram { background: white !important; }
+            [data-theme="dark"] .lesson { background: white !important; color: #1e293b !important; }
+            [data-theme="dark"] .lesson p { color: #475569 !important; }
+            [data-theme="dark"] .lesson .diagram { background: #f8fafc !important; }
+            .topbar { position: static !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================
+         SIDEBAR OVERLAY
+         ======================================== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ========================================
+         SIDEBAR
+         ======================================== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">⚡ FastAPI <span>v2.0</span></div>
+            <div class="search-box">
+                <span class="icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search lessons..." oninput="filterLessons()" enterkeyhint="search">
+                <span class="hint">⌘K</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav" id="lessonNav">
+            <a href="#lesson-1" onclick="closeSidebar(this)"><span>1. Introduction</span><span class="status" id="status-1">○</span></a>
+            <a href="#lesson-2" onclick="closeSidebar(this)"><span>2. Project Structure</span><span class="status" id="status-2">○</span></a>
+            <a href="#lesson-3" onclick="closeSidebar(this)"><span>3. Setup & Installation</span><span class="status" id="status-3">○</span></a>
+            <a href="#lesson-4" onclick="closeSidebar(this)"><span>4. Basic FastAPI</span><span class="status" id="status-4">○</span></a>
+            <a href="#lesson-5" onclick="closeSidebar(this)"><span>5. Path & Query Params</span><span class="status" id="status-5">○</span></a>
+            <a href="#lesson-6" onclick="closeSidebar(this)"><span>6. Request Body & Pydantic</span><span class="status" id="status-6">○</span></a>
+            <a href="#lesson-7" onclick="closeSidebar(this)"><span>7. HTTP Methods</span><span class="status" id="status-7">○</span></a>
+            <a href="#lesson-8" onclick="closeSidebar(this)"><span>8. Dependency Injection</span><span class="status" id="status-8">○</span></a>
+            <a href="#lesson-9" onclick="closeSidebar(this)"><span>9. Database (SQLAlchemy)</span><span class="status" id="status-9">○</span></a>
+            <a href="#lesson-10" onclick="closeSidebar(this)"><span>10. Auth & JWT</span><span class="status" id="status-10">○</span></a>
+            <a href="#lesson-11" onclick="closeSidebar(this)"><span>11. Middleware & CORS</span><span class="status" id="status-11">○</span></a>
+            <a href="#lesson-12" onclick="closeSidebar(this)"><span>12. Async Programming</span><span class="status" id="status-12">○</span></a>
+            <a href="#lesson-13" onclick="closeSidebar(this)"><span>13. Error Handling</span><span class="status" id="status-13">○</span></a>
+            <a href="#lesson-14" onclick="closeSidebar(this)"><span>14. File Upload</span><span class="status" id="status-14">○</span></a>
+            <a href="#lesson-15" onclick="closeSidebar(this)"><span>15. Testing</span><span class="status" id="status-15">○</span></a>
+            <a href="#lesson-16" onclick="closeSidebar(this)"><span>16. Deployment</span><span class="status" id="status-16">○</span></a>
+            <a href="#lesson-17" onclick="closeSidebar(this)"><span>17. Final Project</span><span class="status" id="status-17">○</span></a>
+            <a href="#lesson-18" onclick="closeSidebar(this)"><span>18. WebSockets</span><span class="status" id="status-18">○</span></a>
+            <a href="#lesson-19" onclick="closeSidebar(this)"><span>19. Background Tasks</span><span class="status" id="status-19">○</span></a>
+            <a href="#lesson-20" onclick="closeSidebar(this)"><span>20. Pagination</span><span class="status" id="status-20">○</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="progress-track"><div class="fill" id="progressFill"></div></div>
+            <div class="progress-info"><span id="progressLabel">0% Complete</span><span id="progressCount">0 / 20</span></div>
+        </div>
+    </aside>
+
+    <!-- ========================================
+         MAIN CONTENT
+         ======================================== -->
+    <main class="main" id="mainContent">
+
+        <!-- Top Bar - Mobile First -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
+                <span class="topbar-title">FastAPI</span>
+            </div>
+            <div class="topbar-actions">
+                <button class="btn btn-primary" onclick="exportPDF()" aria-label="Download PDF">
+                    <span class="btn-icon">📄</span>
+                    <span class="btn-text">PDF</span>
+                </button>
+                <button class="btn" onclick="window.print()" aria-label="Print">
+                    <span class="btn-icon">🖨️</span>
+                    <span class="btn-text">Print</span>
+                </button>
+                <button class="btn btn-danger" onclick="resetProgress()" aria-label="Reset progress">
+                    <span class="btn-icon">⟳</span>
+                    <span class="btn-text">Reset</span>
+                </button>
+                <select class="lang-select" onchange="switchLanguage(this.value)" aria-label="Language">
+                    <option value="my">🇲🇲</option>
+                    <option value="en">🇬🇧</option>
+                </select>
+                <button class="dark-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+                    <span id="darkIcon">🌙</span>
+                    <span class="slider"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ========================================
+             LESSON 1
+             ======================================== -->
+        <section class="lesson" id="lesson-1">
+            <span class="lesson-badge essential">Essential</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">1.</span> FastAPI မိတ်ဆက်</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-1')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(1)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>FastAPI သည် Python ကိုသုံးပြီး API တွေကို မြန်မြန်ဆန်ဆန်၊ လုံခြုံအောင်၊ စွမ်းဆောင်ရည်မြင့်အောင် ဆောက်တဲ့ Web Framework တစ်ခုပါ။</p>
+
+                <!-- Diagram - Mobile Optimized -->
+                <div class="diagram">
+                    <svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+                        <defs>
+                            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0d9488"/><stop offset="100%" style="stop-color:#0f766e"/></linearGradient>
+                            <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#2563eb"/></linearGradient>
+                            <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b"/><stop offset="100%" style="stop-color:#d97706"/></linearGradient>
+                            <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient>
+                            <marker id="arrow" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#94a3b8"/></marker>
+                        </defs>
+                        <rect x="20" y="80" width="110" height="64" rx="12" fill="url(#g2)" stroke="none"/>
+                        <text x="75" y="112" text-anchor="middle" fill="white" font-weight="600" font-size="14">🌐 Client</text>
+                        <text x="75" y="132" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Browser</text>
+                        <line x1="130" y1="112" x2="178" y2="112" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="178" y="48" width="160" height="128" rx="14" fill="url(#g1)" stroke="none"/>
+                        <text x="258" y="85" text-anchor="middle" fill="white" font-weight="700" font-size="17">⚡ FastAPI</text>
+                        <text x="258" y="112" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">• Auto Docs</text>
+                        <text x="258" y="132" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">• Async</text>
+                        <text x="258" y="152" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="11">• Type Hints</text>
+                        <line x1="338" y1="112" x2="386" y2="112" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="386" y="74" width="110" height="76" rx="12" fill="url(#g4)" stroke="none"/>
+                        <ellipse cx="441" cy="80" rx="40" ry="8" fill="url(#g4)" stroke="none"/>
+                        <text x="441" y="118" text-anchor="middle" fill="white" font-weight="600" font-size="14">🗄️ DB</text>
+                        <line x1="496" y1="112" x2="544" y2="112" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+                        <rect x="544" y="80" width="80" height="64" rx="12" fill="url(#g3)" stroke="none"/>
+                        <text x="584" y="112" text-anchor="middle" fill="white" font-weight="600" font-size="14">📦 JSON</text>
+                        <text x="584" y="132" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Response</text>
+                        <text x="154" y="170" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">Request</text>
+                        <text x="362" y="170" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">ORM Query</text>
+                        <text x="520" y="170" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">Response</text>
+                    </svg>
+                    <div class="diagram-caption">FastAPI Architecture</div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Feature</th><th>Benefit</th></tr></thead>
+                        <tbody>
+                            <tr><td>⚡ High Performance</td><td>On par with Node.js</td></tr>
+                            <tr><td>📖 Auto Docs</td><td>Swagger + ReDoc</td></tr>
+                            <tr><td>🔧 Type Hints</td><td>Clean code</td></tr>
+                            <tr><td>🔄 Async</td><td>Built-in async/await</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="prereq">
+                    <strong>📚 Prerequisites</strong>
+                    <ul>
+                        <li>Python basics</li>
+                        <li>HTTP Methods</li>
+                        <li>JSON format</li>
+                    </ul>
+                </div>
+
+                <div class="quiz" data-lesson="1">
+                    <div class="quiz-question">❓ FastAPI ရဲ့ အဓိက အားသာချက်က ဘာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1" value="a"> A. Speed + Auto Docs</label>
+                        <label><input type="radio" name="q1" value="b"> B. Can draw images</label>
+                        <label><input type="radio" name="q1" value="c"> C. No DB needed</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 1)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="refs">
+                    <a href="https://fastapi.tiangolo.com/" target="_blank">📖 Official Docs</a>
+                    <a href="https://github.com/tiangolo/fastapi" target="_blank">🐙 GitHub</a>
+                </div>
+
+                <div class="notes" id="notes-1">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-1">Saved</span>
+                    </div>
+                    <textarea id="note-1" placeholder="Write your notes here..." oninput="saveNote(1)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 2
+             ======================================== -->
+        <section class="lesson" id="lesson-2">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">2.</span> Project Structure</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-2')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(2)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Feature-based structure က ပရောဂျက်ကြီးတွေအတွက် အကောင်းဆုံးဖြစ်ပါတယ်။</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 520 280" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+                        <rect x="20" y="20" width="480" height="240" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                        <text x="40" y="50" fill="#5eead4" font-weight="700" font-size="14">📦 fastapi_project/</text>
+                        <rect x="40" y="70" width="440" height="100" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+                        <text x="56" y="96" fill="#60a5fa" font-weight="600" font-size="13">📁 src/</text>
+                        <rect x="64" y="110" width="80" height="44" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                        <text x="104" y="138" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600">🔐 auth/</text>
+                        <rect x="156" y="110" width="80" height="44" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                        <text x="196" y="138" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600">👤 users/</text>
+                        <rect x="248" y="110" width="80" height="44" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                        <text x="288" y="138" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600">⚙️ core/</text>
+                        <rect x="340" y="110" width="80" height="44" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+                        <text x="380" y="138" text-anchor="middle" fill="#34d399" font-size="11" font-weight="600">📄 main.py</text>
+                        <text x="56" y="196" fill="#94a3b8" font-size="12" font-weight="500">📁 tests/</text>
+                        <text x="180" y="196" fill="#94a3b8" font-size="12" font-weight="500">🔐 .env</text>
+                        <text x="290" y="196" fill="#94a3b8" font-size="12" font-weight="500">📦 requirements.txt</text>
+                        <text x="420" y="196" fill="#94a3b8" font-size="12" font-weight="500">🐳 Dockerfile</text>
+                    </svg>
+                    <div class="diagram-caption">Feature-based Project Structure</div>
+                </div>
+
+                <div class="cheat">
+                    <div class="cheat-item"><strong>📁 src/</strong><span>All source code</span></div>
+                    <div class="cheat-item"><strong>📁 tests/</strong><span>Unit tests</span></div>
+                    <div class="cheat-item"><strong>🔐 .env</strong><span>Environment</span></div>
+                    <div class="cheat-item"><strong>📦 requirements.txt</strong><span>Dependencies</span></div>
+                </div>
+
+                <div class="quiz" data-lesson="2">
+                    <div class="quiz-question">❓ Feature-based structure ရဲ့ အားသာချက်က ဘာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q2" value="a"> A. Better code organization</label>
+                        <label><input type="radio" name="q2" value="b"> B. Fewer files</label>
+                        <label><input type="radio" name="q2" value="c"> C. Faster server</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 2)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-2">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-2">Saved</span>
+                    </div>
+                    <textarea id="note-2" placeholder="Write your notes here..." oninput="saveNote(2)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 3
+             ======================================== -->
+        <section class="lesson" id="lesson-3">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">3.</span> Setup & Installation</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-3')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(3)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>FastAPI နဲ့ Uvicorn ကို install လုပ်ပြီး server ကို run ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Bash</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="cm"># Install FastAPI and Uvicorn</span>
+pip install fastapi
+pip install <span class="st">"uvicorn[standard]"</span>
+
+<span class="cm"># Run dev server</span>
+uvicorn main:app --reload</pre>
+                </div>
+
+                <div class="error-box">
+                    <div class="title">⚠️ Common Error: ModuleNotFoundError</div>
+                    <p><span class="solution">✅ Solution:</span> <code class="inline-code">pip install fastapi uvicorn[standard]</code></p>
+                </div>
+
+                <div class="quiz" data-lesson="3">
+                    <div class="quiz-question">❓ Auto-reload အတွက် ဘယ် flag ကိုသုံးမလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q3" value="a"> A. --reload</label>
+                        <label><input type="radio" name="q3" value="b"> B. --restart</label>
+                        <label><input type="radio" name="q3" value="c"> C. --auto</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 3)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-3">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-3">Saved</span>
+                    </div>
+                    <textarea id="note-3" placeholder="Write your notes here..." oninput="saveNote(3)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 4
+             ======================================== -->
+        <section class="lesson" id="lesson-4">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">4.</span> Basic FastAPI</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-4')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(4)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>"Hello World" API ကို အောက်ပါအတိုင်း ရေးသားနိုင်ပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+
+app = FastAPI()
+
+<span class="fn">@app.get</span>(<span class="st">"/"</span>)
+<span class="kw">def</span> <span class="fn">read_root</span>():
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Hello FastAPI"</span>}</pre>
+                </div>
+
+                <div class="quiz" data-lesson="4">
+                    <div class="quiz-question">❓ FastAPI app ကို ဘယ် class နဲ့ ဖန်တီးမလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q4" value="a"> A. FastAPI()</label>
+                        <label><input type="radio" name="q4" value="b"> B. APIRouter()</label>
+                        <label><input type="radio" name="q4" value="c"> C. Flask()</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 4)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-4">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-4">Saved</span>
+                    </div>
+                    <textarea id="note-4" placeholder="Write your notes here..." oninput="saveNote(4)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 5
+             ======================================== -->
+        <section class="lesson" id="lesson-5">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">5.</span> Path & Query Parameters</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-5')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(5)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Path Parameter က URL ထဲမှာ၊ Query Parameter က <code>?</code> နောက်မှာ ပါပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+app = FastAPI()
+
+<span class="fn">@app.get</span>(<span class="st">"/items/{item_id}"</span>)
+<span class="kw">def</span> <span class="fn">read_item</span>(item_id: <span class="kw">int</span>, q: Optional[<span class="kw">str</span>] = <span class="kw">None</span>):
+    <span class="kw">return</span> {<span class="st">"item_id"</span>: item_id, <span class="st">"query"</span>: q}</pre>
+                </div>
+
+                <div class="cheat">
+                    <div class="cheat-item"><strong>Path Parameter</strong><span><code>/items/{id}</code> — Required</span></div>
+                    <div class="cheat-item"><strong>Query Parameter</strong><span><code>?key=value</code> — Optional</span></div>
+                </div>
+
+                <div class="quiz" data-lesson="5">
+                    <div class="quiz-question">❓ Path နဲ့ Query ဘာကွာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q5" value="a"> A. Path in URL, Query after ?</label>
+                        <label><input type="radio" name="q5" value="b"> B. Query in URL, Path after ?</label>
+                        <label><input type="radio" name="q5" value="c"> C. Same</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 5)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-5">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-5">Saved</span>
+                    </div>
+                    <textarea id="note-5" placeholder="Write your notes here..." oninput="saveNote(5)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 6
+             ======================================== -->
+        <section class="lesson" id="lesson-6">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">6.</span> Request Body & Pydantic</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-6')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(6)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Pydantic က data validation အတွက် အသုံးပြုပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+<span class="kw">class</span> <span class="fn">Item</span>(BaseModel):
+    name: <span class="kw">str</span> = Field(..., min_length=1, max_length=100)
+    price: <span class="kw">float</span> = Field(..., gt=0, le=10000)
+    is_offer: Optional[<span class="kw">bool</span>] = <span class="kw">None</span>
+
+<span class="fn">@app.post</span>(<span class="st">"/items/"</span>)
+<span class="kw">def</span> <span class="fn">create_item</span>(item: Item):
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Item created!"</span>, <span class="st">"data"</span>: item}</pre>
+                </div>
+
+                <div class="quiz" data-lesson="6">
+                    <div class="quiz-question">❓ Pydantic က ဘာအတွက်သုံးတာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q6" value="a"> A. Data Validation</label>
+                        <label><input type="radio" name="q6" value="b"> B. Database</label>
+                        <label><input type="radio" name="q6" value="c"> C. Frontend</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 6)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-6">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-6">Saved</span>
+                    </div>
+                    <textarea id="note-6" placeholder="Write your notes here..." oninput="saveNote(6)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 7
+             ======================================== -->
+        <section class="lesson" id="lesson-7">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">7.</span> HTTP Methods (CRUD)</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-7')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(7)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>CRUD operations အတွက် HTTP methods များကို သုံးပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="fn">@app.get</span>(<span class="st">"/users/"</span>)     <span class="cm"># Read all</span>
+<span class="fn">@app.post</span>(<span class="st">"/users/"</span>)    <span class="cm"># Create</span>
+<span class="fn">@app.put</span>(<span class="st">"/users/{id}"</span>)  <span class="cm"># Update</span>
+<span class="fn">@app.delete</span>(<span class="st">"/users/{id}"</span>) <span class="cm"># Delete</span></pre>
+                </div>
+
+                <div class="quiz" data-lesson="7">
+                    <div class="quiz-question">❓ Data အသစ်ဖန်တီးဖို့ ဘယ် method ကိုသုံးမလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q7" value="a"> A. POST</label>
+                        <label><input type="radio" name="q7" value="b"> B. GET</label>
+                        <label><input type="radio" name="q7" value="c"> C. DELETE</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 7)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-7">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-7">Saved</span>
+                    </div>
+                    <textarea id="note-7" placeholder="Write your notes here..." oninput="saveNote(7)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 8
+             ======================================== -->
+        <section class="lesson" id="lesson-8">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">8.</span> Dependency Injection</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-8')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(8)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p><code class="inline-code">Depends</code> က code reuse အတွက် အသုံးပြုပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Depends
+
+app = FastAPI()
+
+<span class="kw">def</span> <span class="fn">common_params</span>(skip: <span class="kw">int</span> = 0, limit: <span class="kw">int</span> = 100):
+    <span class="kw">return</span> {<span class="st">"skip"</span>: skip, <span class="st">"limit"</span>: limit}
+
+<span class="fn">@app.get</span>(<span class="st">"/items/"</span>)
+<span class="kw">def</span> <span class="fn">read_items</span>(params: <span class="kw">dict</span> = Depends(common_params)):
+    <span class="kw">return</span> params</pre>
+                </div>
+
+                <div class="quiz" data-lesson="8">
+                    <div class="quiz-question">❓ Dependency Injection က ဘာအတွက်လဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q8" value="a"> A. Code reusability</label>
+                        <label><input type="radio" name="q8" value="b"> B. Faster server</label>
+                        <label><input type="radio" name="q8" value="c"> C. Database</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 8)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-8">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-8">Saved</span>
+                    </div>
+                    <textarea id="note-8" placeholder="Write your notes here..." oninput="saveNote(8)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 9
+             ======================================== -->
+        <section class="lesson" id="lesson-9">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">9.</span> Database (SQLAlchemy)</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-9')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(9)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>SQLAlchemy ORM က database နဲ့ ချိတ်ဆက်ရန် အသုံးပြုပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> sqlalchemy <span class="kw">import</span> create_engine, Column, Integer, String
+<span class="kw">from</span> sqlalchemy.orm <span class="kw">import</span> declarative_base, sessionmaker
+
+engine = create_engine(<span class="st">"sqlite:///./test.db"</span>)
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
+
+<span class="kw">class</span> <span class="fn">User</span>(Base):
+    __tablename__ = <span class="st">"users"</span>
+    id = Column(Integer, primary_key=<span class="kw">True</span>)
+    name = Column(String)
+
+Base.metadata.create_all(bind=engine)</pre>
+                </div>
+
+                <div class="quiz" data-lesson="9">
+                    <div class="quiz-question">❓ SQLAlchemy က ဘာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q9" value="a"> A. ORM</label>
+                        <label><input type="radio" name="q9" value="b"> B. Web Framework</label>
+                        <label><input type="radio" name="q9" value="c"> C. Frontend</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 9)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-9">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-9">Saved</span>
+                    </div>
+                    <textarea id="note-9" placeholder="Write your notes here..." oninput="saveNote(9)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 10 - JWT
+             ======================================== -->
+        <section class="lesson" id="lesson-10">
+            <span class="lesson-badge essential">Essential</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">10.</span> Authentication & JWT</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-10')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(10)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>JWT (JSON Web Token) က authentication အတွက် အသုံးပြုပါတယ်။</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 640 180" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+                        <defs>
+                            <linearGradient id="j1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#2563eb"/></linearGradient>
+                            <linearGradient id="j2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient>
+                            <linearGradient id="j3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0d9488"/><stop offset="100%" style="stop-color:#0f766e"/></linearGradient>
+                            <linearGradient id="j4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#f59e0b"/><stop offset="100%" style="stop-color:#d97706"/></linearGradient>
+                            <marker id="arj" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7 L2.5,3.5 Z" fill="#94a3b8"/></marker>
+                        </defs>
+                        <rect x="20" y="50" width="100" height="56" rx="10" fill="url(#j1)" stroke="none"/>
+                        <text x="70" y="84" text-anchor="middle" fill="white" font-weight="600" font-size="13">🔐 Login</text>
+                        <line x1="120" y1="78" x2="162" y2="78" stroke="#94a3b8" stroke-width="2" marker-end="url(#arj)"/>
+                        <rect x="162" y="28" width="130" height="100" rx="12" fill="url(#j2)" stroke="none"/>
+                        <text x="227" y="58" text-anchor="middle" fill="white" font-weight="700" font-size="14">🔑 JWT</text>
+                        <text x="227" y="80" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Header</text>
+                        <text x="227" y="96" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Payload</text>
+                        <text x="227" y="112" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Signature</text>
+                        <line x1="292" y1="78" x2="334" y2="78" stroke="#94a3b8" stroke-width="2" marker-end="url(#arj)"/>
+                        <rect x="334" y="44" width="120" height="68" rx="10" fill="url(#j3)" stroke="none"/>
+                        <text x="394" y="74" text-anchor="middle" fill="white" font-weight="600" font-size="13">✅ Protected</text>
+                        <text x="394" y="94" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">API</text>
+                        <line x1="454" y1="78" x2="496" y2="78" stroke="#94a3b8" stroke-width="2" marker-end="url(#arj)"/>
+                        <rect x="496" y="50" width="120" height="56" rx="10" fill="url(#j4)" stroke="none"/>
+                        <text x="556" y="84" text-anchor="middle" fill="white" font-weight="600" font-size="13">📦 Data</text>
+                        <text x="141" y="136" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">Generate</text>
+                        <text x="313" y="136" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">Validate</text>
+                        <text x="475" y="136" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">Return</text>
+                    </svg>
+                    <div class="diagram-caption">JWT Authentication Flow</div>
+                </div>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Depends, HTTPException
+<span class="kw">from</span> fastapi.security <span class="kw">import</span> OAuth2PasswordBearer
+<span class="kw">from</span> jose <span class="kw">import</span> jwt
+
+app = FastAPI()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=<span class="st">"token"</span>)
+
+SECRET_KEY = <span class="st">"your-secret-key"</span>
+ALGORITHM = <span class="st">"HS256"</span>
+
+<span class="fn">@app.get</span>(<span class="st">"/users/me"</span>)
+<span class="kw">async def</span> <span class="fn">get_current_user</span>(token: <span class="kw">str</span> = Depends(oauth2_scheme)):
+    <span class="kw">try</span>:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        <span class="kw">return</span> {<span class="st">"user"</span>: payload.get(<span class="st">"sub"</span>)}
+    <span class="kw">except</span>:
+        <span class="kw">raise</span> HTTPException(status_code=401, detail=<span class="st">"Invalid token"</span>)</pre>
+                </div>
+
+                <div class="refs">
+                    <a href="https://jwt.io/" target="_blank">🔑 JWT.io</a>
+                    <a href="https://fastapi.tiangolo.com/tutorial/security/" target="_blank">🔒 Security</a>
+                </div>
+
+                <div class="quiz" data-lesson="10">
+                    <div class="quiz-question">❓ JWT token က ဘာတွေပါဝင်လဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q10" value="a"> A. User info + Expiration</label>
+                        <label><input type="radio" name="q10" value="b"> B. Password only</label>
+                        <label><input type="radio" name="q10" value="c"> C. Database</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 10)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-10">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-10">Saved</span>
+                    </div>
+                    <textarea id="note-10" placeholder="Write your notes here..." oninput="saveNote(10)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 11
+             ======================================== -->
+        <section class="lesson" id="lesson-11">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">11.</span> Middleware & CORS</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-11')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(11)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>CORS က frontend ကနေ API ကိုခေါ်လို့ရအောင်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi.middleware.cors <span class="kw">import</span> CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[<span class="st">"http://localhost:3000"</span>],
+    allow_methods=[<span class="st">"*"</span>],
+    allow_headers=[<span class="st">"*"</span>],
+)</pre>
+                </div>
+
+                <div class="quiz" data-lesson="11">
+                    <div class="quiz-question">❓ CORS က ဘာအတွက်လဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q11" value="a"> A. Allow frontend to call API</label>
+                        <label><input type="radio" name="q11" value="b"> B. Database</label>
+                        <label><input type="radio" name="q11" value="c"> C. Authentication</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 11)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-11">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-11">Saved</span>
+                    </div>
+                    <textarea id="note-11" placeholder="Write your notes here..." oninput="saveNote(11)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 12
+             ======================================== -->
+        <section class="lesson" id="lesson-12">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">12.</span> Async Programming</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-12')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(12)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p><code class="inline-code">async/await</code> က concurrent processing အတွက်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">import</span> asyncio
+
+<span class="fn">@app.get</span>(<span class="st">"/async"</span>)
+<span class="kw">async def</span> <span class="fn">do_work</span>():
+    <span class="kw">await</span> asyncio.sleep(2)
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Done"</span>}</pre>
+                </div>
+
+                <div class="quiz" data-lesson="12">
+                    <div class="quiz-question">❓ async/await က ဘာအတွက်ကောင်းလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q12" value="a"> A. Concurrent execution</label>
+                        <label><input type="radio" name="q12" value="b"> B. Shorter code</label>
+                        <label><input type="radio" name="q12" value="c"> C. Faster DB</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 12)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-12">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-12">Saved</span>
+                    </div>
+                    <textarea id="note-12" placeholder="Write your notes here..." oninput="saveNote(12)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 13
+             ======================================== -->
+        <section class="lesson" id="lesson-13">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">13.</span> Error Handling</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-13')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(13)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p><code class="inline-code">HTTPException</code> က error ကို စနစ်တကျပြဖို့ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> HTTPException
+
+<span class="fn">@app.get</span>(<span class="st">"/items/{id}"</span>)
+<span class="kw">def</span> <span class="fn">get_item</span>(id: <span class="kw">int</span>):
+    <span class="kw">if</span> id <span class="kw">not in</span> db:
+        <span class="kw">raise</span> HTTPException(status_code=404, detail=<span class="st">"Not found"</span>)
+    <span class="kw">return</span> db[id]</pre>
+                </div>
+
+                <div class="quiz" data-lesson="13">
+                    <div class="quiz-question">❓ HTTPException က ဘာအတွက်လဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q13" value="a"> A. Structured errors</label>
+                        <label><input type="radio" name="q13" value="b"> B. Server crash</label>
+                        <label><input type="radio" name="q13" value="c"> C. Delete data</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 13)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-13">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-13">Saved</span>
+                    </div>
+                    <textarea id="note-13" placeholder="Write your notes here..." oninput="saveNote(13)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 14
+             ======================================== -->
+        <section class="lesson" id="lesson-14">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">14.</span> File Upload</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-14')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(14)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p><code class="inline-code">UploadFile</code> က file upload အတွက်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> File, UploadFile
+
+<span class="fn">@app.post</span>(<span class="st">"/upload/"</span>)
+<span class="kw">async def</span> <span class="fn">upload</span>(file: UploadFile = File(...)):
+    content = <span class="kw">await</span> file.read()
+    <span class="kw">return</span> {<span class="st">"filename"</span>: file.filename, <span class="st">"size"</span>: <span class="kw">len</span>(content)}</pre>
+                </div>
+
+                <div class="error-box">
+                    <div class="title">⚠️ Common Error: ImportError</div>
+                    <p><span class="solution">✅ Solution:</span> <code class="inline-code">pip install python-multipart</code></p>
+                </div>
+
+                <div class="quiz" data-lesson="14">
+                    <div class="quiz-question">❓ File upload အတွက် ဘယ် library ထည့်ရမလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q14" value="a"> A. python-multipart</label>
+                        <label><input type="radio" name="q14" value="b"> B. file-uploader</label>
+                        <label><input type="radio" name="q14" value="c"> C. fastapi-files</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 14)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-14">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-14">Saved</span>
+                    </div>
+                    <textarea id="note-14" placeholder="Write your notes here..." oninput="saveNote(14)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 15
+             ======================================== -->
+        <section class="lesson" id="lesson-15">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">15.</span> Testing</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-15')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(15)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p><code class="inline-code">TestClient</code> က API testing အတွက်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi.testclient <span class="kw">import</span> TestClient
+<span class="kw">from</span> main <span class="kw">import</span> app
+
+client = TestClient(app)
+
+<span class="kw">def</span> <span class="fn">test_root</span>():
+    resp = client.get(<span class="st">"/"</span>)
+    <span class="kw">assert</span> resp.status_code == 200</pre>
+                </div>
+
+                <div class="quiz" data-lesson="15">
+                    <div class="quiz-question">❓ API testing အတွက် ဘယ် library ကိုသုံးလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q15" value="a"> A. pytest + TestClient</label>
+                        <label><input type="radio" name="q15" value="b"> B. unittest only</label>
+                        <label><input type="radio" name="q15" value="c"> C. nose</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 15)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-15">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-15">Saved</span>
+                    </div>
+                    <textarea id="note-15" placeholder="Write your notes here..." oninput="saveNote(15)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 16
+             ======================================== -->
+        <section class="lesson" id="lesson-16">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">16.</span> Deployment</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-16')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(16)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Docker က container-based deployment အတွက်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Dockerfile</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">FROM</span> python:3.9-slim
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> requirements.txt .
+<span class="kw">RUN</span> pip install -r requirements.txt
+<span class="kw">COPY</span> . .
+<span class="kw">CMD</span> [<span class="st">"uvicorn"</span>, <span class="st">"main:app"</span>, <span class="st">"--host"</span>, <span class="st">"0.0.0.0"</span>, <span class="st">"--port"</span>, <span class="st">"80"</span>]</pre>
+                </div>
+
+                <div class="refs">
+                    <a href="https://docs.docker.com/" target="_blank">🐳 Docker</a>
+                    <a href="https://fastapi.tiangolo.com/deployment/" target="_blank">🚀 Deployment</a>
+                </div>
+
+                <div class="quiz" data-lesson="16">
+                    <div class="quiz-question">❓ Docker က ဘာအတွက်သုံးတာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q16" value="a"> A. Containerized deployment</label>
+                        <label><input type="radio" name="q16" value="b"> B. Writing code</label>
+                        <label><input type="radio" name="q16" value="c"> C. Database</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 16)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-16">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-16">Saved</span>
+                    </div>
+                    <textarea id="note-16" placeholder="Write your notes here..." oninput="saveNote(16)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 17
+             ======================================== -->
+        <section class="lesson" id="lesson-17">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">17.</span> Final Project</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-17')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(17)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Complete CRUD Task Manager API နမူနာ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">class</span> <span class="fn">Task</span>(BaseModel):
+    id: Optional[<span class="kw">int</span>] = <span class="kw">None</span>
+    title: <span class="kw">str</span> = Field(..., min_length=1)
+    completed: <span class="kw">bool</span> = <span class="kw">False</span>
+
+tasks_db = []
+
+<span class="fn">@app.post</span>(<span class="st">"/tasks/"</span>)
+<span class="kw">def</span> <span class="fn">create</span>(task: Task):
+    tasks_db.append(task)
+    <span class="kw">return</span> task
+
+<span class="fn">@app.get</span>(<span class="st">"/tasks/"</span>)
+<span class="kw">def</span> <span class="fn">list</span>(skip: <span class="kw">int</span> = 0, limit: <span class="kw">int</span> = 10):
+    <span class="kw">return</span> tasks_db[skip:skip + limit]</pre>
+                </div>
+
+                <div class="refs">
+                    <a href="https://fastapi.tiangolo.com/tutorial/" target="_blank">📚 Full Tutorial</a>
+                    <a href="https://github.com/tiangolo/fastapi" target="_blank">🐙 GitHub</a>
+                </div>
+
+                <div class="notes" id="notes-17">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-17">Saved</span>
+                    </div>
+                    <textarea id="note-17" placeholder="Write your notes here..." oninput="saveNote(17)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 18
+             ======================================== -->
+        <section class="lesson" id="lesson-18">
+            <span class="lesson-badge advanced">Advanced</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">18.</span> WebSockets</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-18')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(18)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Real-time communication အတွက် WebSockets ကိုသုံးပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="fn">@app.websocket</span>(<span class="st">"/ws"</span>)
+<span class="kw">async def</span> <span class="fn">ws_endpoint</span>(websocket: WebSocket):
+    <span class="kw">await</span> websocket.accept()
+    <span class="kw">while</span> <span class="kw">True</span>:
+        data = <span class="kw">await</span> websocket.receive_text()
+        <span class="kw">await</span> websocket.send_text(f<span class="st">"Echo: {data}"</span>)</pre>
+                </div>
+
+                <div class="quiz" data-lesson="18">
+                    <div class="quiz-question">❓ WebSocket က ဘာအတွက်သုံးလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q18" value="a"> A. Real-time communication</label>
+                        <label><input type="radio" name="q18" value="b"> B. Database</label>
+                        <label><input type="radio" name="q18" value="c"> C. File upload</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 18)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-18">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-18">Saved</span>
+                    </div>
+                    <textarea id="note-18" placeholder="Write your notes here..." oninput="saveNote(18)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 19
+             ======================================== -->
+        <section class="lesson" id="lesson-19">
+            <span class="lesson-badge advanced">Advanced</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">19.</span> Background Tasks</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-19')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(19)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>BackgroundTasks က long-running tasks အတွက်ပါ။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="kw">from</span> fastapi <span class="kw">import</span> BackgroundTasks
+
+<span class="kw">def</span> <span class="fn">send_email</span>(email: <span class="kw">str</span>):
+    <span class="kw">print</span>(f<span class="st">"Sending to {email}"</span>)
+
+<span class="fn">@app.post</span>(<span class="st">"/notify/"</span>)
+<span class="kw">def</span> <span class="fn">notify</span>(email: <span class="kw">str</span>, tasks: BackgroundTasks):
+    tasks.add_task(send_email, email)
+    <span class="kw">return</span> {<span class="st">"message"</span>: <span class="st">"Queued"</span>}</pre>
+                </div>
+
+                <div class="quiz" data-lesson="19">
+                    <div class="quiz-question">❓ BackgroundTasks က ဘာအတွက်ကောင်းလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q19" value="a"> A. Long-running background jobs</label>
+                        <label><input type="radio" name="q19" value="b"> B. Database</label>
+                        <label><input type="radio" name="q19" value="c"> C. Frontend</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 19)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-19">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-19">Saved</span>
+                    </div>
+                    <textarea id="note-19" placeholder="Write your notes here..." oninput="saveNote(19)"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             LESSON 20
+             ======================================== -->
+        <section class="lesson" id="lesson-20">
+            <span class="lesson-badge default">Core</span>
+            <div class="lesson-header">
+                <div class="top-row">
+                    <h2 class="lesson-title"><span class="num">20.</span> Pagination</h2>
+                    <div class="lesson-actions">
+                        <button class="btn-sm" onclick="shareLesson('lesson-20')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-sm" onclick="scrollToNotes(20)"><i class="fas fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="lesson-body">
+                <p>Pagination က performance အတွက် အရေးကြီးပါတယ်။</p>
+
+                <div class="code-wrap">
+                    <span class="lang-tag">Python</span>
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+                    <pre><span class="fn">@app.get</span>(<span class="st">"/items/"</span>)
+<span class="kw">def</span> <span class="fn">get_items</span>(
+    page: <span class="kw">int</span> = Query(1, ge=1),
+    size: <span class="kw">int</span> = Query(10, ge=1, le=50)
+):
+    start = (page - 1) * size
+    <span class="kw">return</span> {
+        <span class="st">"page"</span>: page,
+        <span class="st">"size"</span>: size,
+        <span class="st">"items"</span>: db[start:start + size]
+    }</pre>
+                </div>
+
+                <div class="quiz" data-lesson="20">
+                    <div class="quiz-question">❓ Pagination က ဘာကြောင့်အရေးကြီးတာလဲ?</div>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q20" value="a"> A. Performance optimization</label>
+                        <label><input type="radio" name="q20" value="b"> B. Faster DB</label>
+                        <label><input type="radio" name="q20" value="c"> C. Better UI</label>
+                    </div>
+                    <button class="quiz-btn" onclick="checkQuiz(this, 20)">Check Answer</button>
+                    <div class="quiz-result"></div>
+                </div>
+
+                <div class="notes" id="notes-20">
+                    <div class="notes-header">
+                        <h4><i class="fas fa-pen"></i> Notes</h4>
+                        <span class="status" id="noteStatus-20">Saved</span>
+                    </div>
+                    <textarea id="note-20" placeholder="Write your notes here..." oninput="saveNote(20)"></textarea>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================
+         TOAST
+         ======================================== -->
+    <div class="toast" id="toast">
+        <span id="toastMessage">✅ Done</span>
+    </div>
+
+    <!-- ========================================
+         PDF LOADER
+         ======================================== -->
+    <div class="pdf-loader" id="pdfLoader">
+        <div class="spinner"></div>
+        <p>Generating PDF...</p>
+    </div>
+
+    <!-- ========================================
+         JAVASCRIPT
+         ======================================== -->
+    <script>
+        // ============================================
+        // Quiz Answers
+        // ============================================
+        const QUIZ_ANSWERS = {
+            'q1': 'a', 'q2': 'a', 'q3': 'a', 'q4': 'a', 'q5': 'a',
+            'q6': 'a', 'q7': 'a', 'q8': 'a', 'q9': 'a', 'q10': 'a',
+            'q11': 'a', 'q12': 'a', 'q13': 'a', 'q14': 'a', 'q15': 'a',
+            'q16': 'a', 'q17': 'a', 'q18': 'a', 'q19': 'a', 'q20': 'a'
+        };
+
+        // ============================================
+        // Quiz System
+        // ============================================
+        function checkQuiz(btn, lessonNum) {
+            const container = btn.closest('.quiz');
+            const options = container.querySelectorAll('input[type="radio"]');
+            const result = container.querySelector('.quiz-result');
+            let selected = null;
+            let selectedLabel = null;
+
+            options.forEach(opt => {
+                if (opt.checked) {
+                    selected = opt.value;
+                    selectedLabel = opt.closest('label');
+                }
+            });
+
+            if (!selected) {
+                result.textContent = '⚠️ Please select an answer.';
+                result.className = 'quiz-result show fail';
+                return;
+            }
+
+            const name = options[0].name;
+            const correct = QUIZ_ANSWERS[name];
+
+            container.querySelectorAll('.quiz-options label').forEach(l => {
+                l.classList.remove('correct', 'wrong');
+            });
+
+            if (selected === correct) {
+                selectedLabel.classList.add('correct');
+                result.textContent = '✅ Correct! 🎉';
+                result.className = 'quiz-result show pass';
+                markCompleted(lessonNum);
+            } else {
+                selectedLabel.classList.add('wrong');
+                const labels = container.querySelectorAll('.quiz-options label');
+                labels.forEach(l => {
+                    if (l.querySelector('input').value === correct) {
+                        l.classList.add('correct');
+                    }
+                });
+                result.textContent = '❌ Not quite. Correct answer is highlighted.';
+                result.className = 'quiz-result show fail';
+            }
+        }
+
+        // ============================================
+        // Progress
+        // ============================================
+        function markCompleted(num) {
+            const el = document.getElementById('status-' + num);
+            if (el) {
+                el.textContent = '✓';
+                el.className = 'status done';
+            }
+            updateProgress();
+            saveProgress(num);
+        }
+
+        function updateProgress() {
+            const done = document.querySelectorAll('.status.done').length;
+            const total = document.querySelectorAll('.status').length;
+            const pct = Math.round((done / total) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressLabel').textContent = pct + '% Complete';
+            document.getElementById('progressCount').textContent = done + ' / ' + total;
+        }
+
+        function saveProgress(num) {
+            const data = JSON.parse(localStorage.getItem('fastapi_progress') || '[]');
+            if (!data.includes(num)) {
+                data.push(num);
+                localStorage.setItem('fastapi_progress', JSON.stringify(data));
+            }
+        }
+
+        function loadProgress() {
+            const data = JSON.parse(localStorage.getItem('fastapi_progress') || '[]');
+            data.forEach(num => {
+                const el = document.getElementById('status-' + num);
+                if (el) {
+                    el.textContent = '✓';
+                    el.className = 'status done';
+                }
+            });
+            updateProgress();
+        }
+
+        function resetProgress() {
+            if (confirm('Reset all progress?')) {
+                localStorage.removeItem('fastapi_progress');
+                document.querySelectorAll('.status').forEach(el => {
+                    el.textContent = '○';
+                    el.className = 'status';
+                });
+                updateProgress();
+                showToast('🔄 Progress reset');
+            }
+        }
+
+        // ============================================
+        // Notes
+        // ============================================
+        function saveNote(num) {
+            const el = document.getElementById('note-' + num);
+            if (el) {
+                localStorage.setItem('note_' + num, el.value);
+                const status = document.getElementById('noteStatus-' + num);
+                if (status) {
+                    status.textContent = '💾 Saved';
+                    status.style.color = '#22c55e';
+                    setTimeout(() => { status.style.color = ''; }, 2000);
+                }
+            }
+        }
+
+        function loadNotes() {
+            for (let i = 1; i <= 20; i++) {
+                const el = document.getElementById('note-' + i);
+                if (el) {
+                    const saved = localStorage.getItem('note_' + i);
+                    if (saved) el.value = saved;
+                }
+            }
+        }
+
+        function scrollToNotes(num) {
+            const el = document.getElementById('notes-' + num);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const ta = document.getElementById('note-' + num);
+                if (ta) ta.focus();
+            }
+        }
+
+        // ============================================
+        // Share
+        // ============================================
+        function shareLesson(id) {
+            const url = window.location.href.split('#')[0] + '#' + id;
+            if (navigator.share) {
+                navigator.share({ title: 'FastAPI Lesson', url: url });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('🔗 Link copied!');
+                });
+            }
+        }
+
+        // ============================================
+        // Copy Code
+        // ============================================
+        function copyCode(btn) {
+            const pre = btn.closest('.code-wrap').querySelector('pre');
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                btn.textContent = '✅ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // ============================================
+        // PDF Export
+        // ============================================
+        async function exportPDF() {
+            const loader = document.getElementById('pdfLoader');
+            loader.classList.add('show');
+
+            const element = document.getElementById('mainContent');
+
+            const actions = document.querySelectorAll('.lesson-actions, .notes, .topbar-actions');
+            actions.forEach(el => el.style.display = 'none');
+
+            try {
+                await html2pdf().set({
+                    margin: 12,
+                    filename: 'FastAPI_Masterclass.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                }).from(element).save();
+            } catch (err) {
+                console.error('PDF Error:', err);
+                showToast('❌ PDF failed: ' + err.message);
+            }
+
+            actions.forEach(el => el.style.display = '');
+            loader.classList.remove('show');
+            showToast('📄 PDF downloaded!');
+        }
+
+        // ============================================
+        // Toast
+        // ============================================
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ============================================
+        // Dark Mode
+        // ============================================
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('darkIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                icon.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('darkIcon').textContent = '☀️';
+        }
+
+        // ============================================
+        // Sidebar - Mobile
+        // ============================================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeSidebar(el) {
+            document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            el.classList.add('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('open');
+            this.classList.remove('show');
+            document.body.style.overflow = '';
+        });
+
+        // ============================================
+        // Search
+        // ============================================
+        function filterLessons() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            const links = document.querySelectorAll('.sidebar-nav a');
+            links.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                link.style.display = text.includes(q) || q === '' ? '' : 'none';
+            });
+        }
+
+        // ============================================
+        // Language
+        // ============================================
+        function switchLanguage(lang) {
+            if (lang === 'en') {
+                showToast('🌍 English version coming soon!');
+            }
+        }
+
+        // ============================================
+        // Keyboard Shortcuts - Mobile Friendly
+        // ============================================
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+K or Cmd+K
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const input = document.getElementById('searchInput');
+                input.focus();
+                input.select();
+                showToast('🔍 Search focused');
+            }
+            // Ctrl+D or Cmd+D
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                toggleDarkMode();
+            }
+            // Ctrl+Shift+P
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+                e.preventDefault();
+                exportPDF();
+            }
+            // Ctrl+Shift+R
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+                e.preventDefault();
+                resetProgress();
+            }
+            // Escape to close sidebar
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    document.getElementById('sidebarOverlay').classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
+
+        // ============================================
+        // Scroll Active - Mobile friendly
+        // ============================================
+        const sections = document.querySelectorAll('.lesson');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                let current = '';
+                sections.forEach(s => {
+                    const top = s.offsetTop;
+                    if (window.pageYOffset >= top - 120) {
+                        current = s.id;
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+                });
+            }, 100);
+        }, { passive: true });
+
+        // ============================================
+        // Init
+        // ============================================
+        window.onload = function() {
+            loadProgress();
+            loadNotes();
+            const first = document.querySelector('.sidebar-nav a');
+            if (first) first.classList.add('active');
+
+            // Mobile: Check if there's a hash on load
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const target = document.querySelector(window.location.hash);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 400);
+            }
+
+            // Show shortcut hint once (with delay for mobile)
+            if (!localStorage.getItem('shortcuts_shown')) {
+                setTimeout(() => {
+                    const isMobile = window.innerWidth <= 768;
+                    const msg = isMobile ? 
+                        '👆 Tap ☰ for menu' : 
+                        '⌨️ Ctrl+K to search • Ctrl+D for dark mode';
+                    showToast(msg);
+                    localStorage.setItem('shortcuts_shown', 'true');
+                }, 2500);
+            }
+        };
+
+        // Handle resize for sidebar
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window.innerWidth >= 1024) {
+                    document.getElementById('sidebar').classList.remove('open');
+                    document.getElementById('sidebarOverlay').classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }, 300);
+        });
+    </script>
+
+</body>
+</html>
